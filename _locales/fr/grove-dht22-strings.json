@@ -1,1 +1,15 @@
+{
+  "groveDHT22|block": "Grove DHT22",
+  "groveDHT22.read|block": "Lire %what|sur %pin",
 
+  "groveDHT22.DHT22Data": "Mesure DHT22",
+  "groveDHT22.DHT22Data.TemperatureC|block": "Température (°C)",
+  "groveDHT22.DHT22Data.Humidity|block": "Humidité (%HR)",
+
+  "groveDHT22.DHT22Pin": "Broche DHT22",
+  "groveDHT22.DHT22Pin.P0|block": "P0",
+  "groveDHT22.DHT22Pin.P1|block": "P1",
+  "groveDHT22.DHT22Pin.P2|block": "P2",
+  "groveDHT22.DHT22Pin.P8|block": "P8",
+  "groveDHT22.DHT22Pin.P15|block": "P15"
+}
