@@ -1,1 +1,10 @@
-
+{
+  "name": "mon-extension",
+  "version": "0.0.1",
+  "description": "Mon extension MakeCode micro:bit",
+  "dependencies": {
+    "core": "*"
+  },
+  "files": ["main.ts", "README.md"],
+  "public": true
+}
