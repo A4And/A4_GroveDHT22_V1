@@ -1,3 +1,4 @@
+```json
 {
   "name": "mon-extension",
   "version": "0.0.1",
@@ -8,3 +9,4 @@
   "files": ["main.ts", "README.md"],
   "public": true
 }
+```
