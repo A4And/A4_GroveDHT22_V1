@@ -67,6 +67,7 @@ namespace groveDHT22 {
     let lastTempC = NaN
     let lastHum = NaN
     let lastOk = false
+    let lastPin = -1
 
     const MIN_INTERVAL_MS = 2000
     const PULSE_TIMEOUT_US = 2500
@@ -123,6 +124,12 @@ namespace groveDHT22 {
     }
 
     function ensureFresh(pin: DigitalPin): void {
+        const currentPin = pin as number
+        if (currentPin != lastPin) {
+            lastPin = currentPin
+            lastReadMs = -999999
+        }
+
         const now = control.millis()
         if (now - lastReadMs < MIN_INTERVAL_MS) return
 
@@ -157,6 +164,7 @@ namespace groveDHT22 {
 
     //% block="forcer mesure DHT22 sur broche %pin"
     export function force(pin: DigitalPin): void {
+        lastPin = pin as number
         lastReadMs = -999999
         ensureFresh(pin)
     }
