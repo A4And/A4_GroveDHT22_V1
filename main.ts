@@ -67,10 +67,13 @@ namespace groveDHT22 {
     let lastTempC = NaN
     let lastHum = NaN
     let lastOk = false
+    let hasValidSample = false
     let lastPin = -1
 
     const MIN_INTERVAL_MS = 2000
     const PULSE_TIMEOUT_US = 2500
+    const MAX_RETRIES = 3
+    const RETRY_PAUSE_MS = 60
 
     function readOnce(pin: DigitalPin): boolean {
         // Start signal: LOW >= 1ms
@@ -120,7 +123,16 @@ namespace groveDHT22 {
 
         lastHum = hum
         lastTempC = temp
+        hasValidSample = true
         return true
+    }
+
+    function readWithRetry(pin: DigitalPin): boolean {
+        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            if (readOnce(pin)) return true
+            basic.pause(RETRY_PAUSE_MS)
+        }
+        return false
     }
 
     function ensureFresh(pin: DigitalPin): void {
@@ -134,13 +146,13 @@ namespace groveDHT22 {
         if (now - lastReadMs < MIN_INTERVAL_MS) return
 
         lastReadMs = now
-        lastOk = readOnce(pin)
+        lastOk = readWithRetry(pin)
     }
 
     //% block="lire DHT22 %what|sur broche %pin"
     export function read(pin: DigitalPin, what: DHT22Data): number {
         ensureFresh(pin)
-        if (!lastOk) return NaN
+        if (!lastOk && !hasValidSample) return NaN
         return what == DHT22Data.TemperatureC ? lastTempC : lastHum
     }
 
