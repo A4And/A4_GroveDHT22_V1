@@ -69,20 +69,26 @@ namespace groveDHT22 {
     let lastOk = false
     let hasValidSample = false
     let lastPin = -1
+    let sensorBootstrapped = false
 
     const MIN_INTERVAL_MS = 2000
-    const PULSE_TIMEOUT_US = 2500
+    const PULSE_TIMEOUT_US = 10000
     const MAX_RETRIES = 3
     const RETRY_PAUSE_MS = 60
 
     function readOnce(pin: DigitalPin): boolean {
+        // Keep line HIGH before start signal
+        pins.setPull(pin, PinPullMode.PullUp)
+        pins.digitalWritePin(pin, 1)
+        control.waitMicros(40)
+
         // Start signal: LOW >= 1ms
         pins.digitalWritePin(pin, 0)
         basic.pause(2)
 
         // Then HIGH 20-40us
         pins.digitalWritePin(pin, 1)
-        control.waitMicros(30)
+        control.waitMicros(40)
 
         // Release line: input + pull-up
         pins.digitalReadPin(pin)
@@ -140,6 +146,14 @@ namespace groveDHT22 {
         if (currentPin != lastPin) {
             lastPin = currentPin
             lastReadMs = -999999
+            hasValidSample = false
+            sensorBootstrapped = false
+        }
+
+        // DHT22 requires a startup stabilization delay after power-on / first use
+        if (!sensorBootstrapped) {
+            basic.pause(1200)
+            sensorBootstrapped = true
         }
 
         const now = control.millis()
