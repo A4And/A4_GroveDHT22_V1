@@ -1,6 +1,6 @@
 ```typescript
 //% color=#2F5597 icon="\uf2c9" block="Mon Extension"
-namespace monExtension {
+namespace A4_Grove_DHT22 {
 }
 ```
 
