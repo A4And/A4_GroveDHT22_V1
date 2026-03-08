@@ -76,6 +76,25 @@ namespace groveDHT22 {
     const MAX_RETRIES = 3
     const RETRY_PAUSE_MS = 60
 
+    function waitForLevel(pin: DigitalPin, level: number, timeoutUs: number): boolean {
+        const start = control.micros()
+        while (pins.digitalReadPin(pin) != level) {
+            if (control.micros() - start > timeoutUs) return false
+        }
+        return true
+    }
+
+    function measureHighPulse(pin: DigitalPin, timeoutUs: number): number {
+        // Wait for HIGH start
+        if (!waitForLevel(pin, 1, timeoutUs)) return 0
+
+        const start = control.micros()
+        while (pins.digitalReadPin(pin) == 1) {
+            if (control.micros() - start > timeoutUs) return 0
+        }
+        return control.micros() - start
+    }
+
     function readOnce(pin: DigitalPin): boolean {
         // Keep line HIGH before start signal
         pins.setPull(pin, PinPullMode.PullUp)
@@ -95,18 +114,17 @@ namespace groveDHT22 {
         pins.setPull(pin, PinPullMode.PullUp)
 
         // Sensor response: ~80us LOW then ~80us HIGH
-        const tLow = pins.pulseIn(pin, PulseValue.Low, PULSE_TIMEOUT_US)
-        const tHigh = pins.pulseIn(pin, PulseValue.High, PULSE_TIMEOUT_US)
-        if (tLow == 0 || tHigh == 0) return false
+        if (!waitForLevel(pin, 0, PULSE_TIMEOUT_US)) return false
+        if (!waitForLevel(pin, 1, PULSE_TIMEOUT_US)) return false
+        if (!waitForLevel(pin, 0, PULSE_TIMEOUT_US)) return false
 
         // Read 40 bits = 5 bytes
         const data: number[] = [0, 0, 0, 0, 0]
 
         for (let i = 0; i < 40; i++) {
-            // Each bit: 50us LOW + HIGH (~26-28us => 0 ; ~70us => 1)
-            const lowPulse = pins.pulseIn(pin, PulseValue.Low, PULSE_TIMEOUT_US)
-            const highPulse = pins.pulseIn(pin, PulseValue.High, PULSE_TIMEOUT_US)
-            if (lowPulse == 0 || highPulse == 0) return false
+            // Each bit: ~50us LOW then HIGH (~26-28us => 0 ; ~70us => 1)
+            const highPulse = measureHighPulse(pin, PULSE_TIMEOUT_US)
+            if (highPulse == 0) return false
 
             const bit = highPulse > 50 ? 1 : 0
             const byteIndex = Math.idiv(i, 8)
