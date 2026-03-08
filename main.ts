@@ -1,24 +1,46 @@
-```typescript
-//% color=#2F5597 icon="\uf2c9" block="Mon Extension"
-namespace A4_Grove_DHT22 {
-}
-```
-
-- `block="..."` définit le nom de la catégorie de blocs
-- `color` et `icon` personnalisent l’apparence dans l’éditeur
-
-//% block="lire valeur sur broche %pin"
-export function lire(pin: DigitalPin): number {
-    return pins.digitalReadPin(pin)
-}
-export enum Mesure {
-    //% block="température"
-    Temperature = 0,
-    //% block="humidité"
-    Humidite = 1
-}
-
-//% block="lire %what"
-export function lireMesure(what: Mesure): number {
-    return 0
-}
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/main.ts b/main.ts
+index 7f9751d8926dc21baff6f171d4b903c7b68a1a45..d200635acfcc5706573c4ff273f2aff4d9f61512 100644
+--- a/main.ts
++++ b/main.ts
+@@ -1,32 +1,30 @@
+-/**
+- * Grove DHT22 (Temperature & Humidity Sensor Pro) - micro:bit MakeCode extension
+- * - Protocole single-bus DHT22 (timing µs)
+- * - Checksum
+- * - Cache 2s (respect période mini d'acquisition)
+- * - Dropdown BitMaker V2 avec choix explicite de la broche DATA
+- */
++// Grove DHT22 (Temperature & Humidity Sensor Pro) - extension MakeCode micro:bit
++// - Protocole single-bus DHT22 (timing us)
++// - Checksum
++// - Cache 2s (respect de la periode mini d'acquisition)
++// - Dropdown BitMaker V2 avec choix explicite de la broche DATA
+ 
+ //% color=#2F5597 icon="\uf2c9" block="Grove DHT22"
+ namespace groveDHT22 {
+ 
+     export enum DHT22Data {
+         //% block="température (°C)"
+         TemperatureC = 0,
+         //% block="humidité (%RH)"
+         Humidity = 1
+     }
+ 
+     /**
+      * Sélection explicite de la broche DATA sur les ports Grove "doubles" du BitMaker V2.
+      * Le DHT22 n’utilise qu’1 fil DATA.
+      */
+     export enum BitMakerPortData {
+         //% block="P0 / P1 (DATA = P0)"
+         P0P1_DataP0 = 0,
+         //% block="P0 / P1 (DATA = P1)"
+         P0P1_DataP1 = 1,
+ 
+         //% block="P1 / P2 (DATA = P1)"
+         P1P2_DataP1 = 2,
+         //% block="P1 / P2 (DATA = P2)"
+         P1P2_DataP2 = 3,
+ 
+EOF
+)
