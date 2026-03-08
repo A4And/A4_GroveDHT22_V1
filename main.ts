@@ -5,10 +5,34 @@
 namespace groveDHT22 {
 
     export enum DHT22Data {
-        //% block="température (°C)"
+        //% block="Temperature (°C)"
         TemperatureC = 0,
-        //% block="humidité (%RH)"
+        //% block="Humidity (%HR)"
         Humidity = 1
+    }
+
+    export enum DHT22Pin {
+        //% block="P0"
+        P0 = 0,
+        //% block="P1"
+        P1 = 1,
+        //% block="P2"
+        P2 = 2,
+        //% block="P8"
+        P8 = 8,
+        //% block="P15"
+        P15 = 15
+    }
+
+    function toDigitalPin(pin: DHT22Pin): DigitalPin {
+        switch (pin) {
+            case DHT22Pin.P0: return DigitalPin.P0
+            case DHT22Pin.P1: return DigitalPin.P1
+            case DHT22Pin.P2: return DigitalPin.P2
+            case DHT22Pin.P8: return DigitalPin.P8
+            case DHT22Pin.P15: return DigitalPin.P15
+            default: return DigitalPin.P0
+        }
     }
 
     let lastReadMs = -999999
@@ -120,9 +144,10 @@ namespace groveDHT22 {
         lastOk = readWithRetry(pin)
     }
 
-    //% block="lire DHT22 sur broche %pin|valeur %what"
-    export function read(pin: DigitalPin, what: DHT22Data): number {
-        ensureFresh(pin)
+    //% block="Read %what|on %pin"
+    export function read(what: DHT22Data, pin: DHT22Pin): number {
+        const dpin = toDigitalPin(pin)
+        ensureFresh(dpin)
         if (!lastOk && !hasValidSample) return NaN
         return what == DHT22Data.TemperatureC ? lastTempC : lastHum
     }
